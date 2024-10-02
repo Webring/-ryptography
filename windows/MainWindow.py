@@ -9,6 +9,9 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.sequence = ""
+        self.probabilities = dict()
+
         # Настройка окна
         self.setWindowTitle("Криптография")
         self.setWindowIcon(QtGui.QIcon('icon.png'))
@@ -23,10 +26,10 @@ class MainWindow(QMainWindow):
 
         task_1_tab = QWidget()
         task_1_tab_layout = QVBoxLayout()
-        self.sequence = QLineEdit()
+        self.sequence_input = QLineEdit()
         self.encode_button = QPushButton("Кодировать")
         self.decode_button = QPushButton("Декодировать")
-        task_1_tab_layout.addWidget(self.sequence)
+        task_1_tab_layout.addWidget(self.sequence_input)
         task_1_tab_layout.addWidget(self.encode_button)
         task_1_tab_layout.addWidget(self.decode_button)
 
