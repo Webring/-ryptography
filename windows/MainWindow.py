@@ -1,0 +1,97 @@
+from PyQt5 import QtGui
+from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QTabWidget, QTableView, QAction, QMessageBox, \
+    QFileDialog, QLineEdit, QPushButton, QVBoxLayout
+
+from windows.AboutWindow import AboutWindow
+
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        # Настройка окна
+        self.setWindowTitle("Криптография")
+        self.setWindowIcon(QtGui.QIcon('icon.png'))
+        self.initUI()
+        self.create_menu()
+
+
+    def initUI(self):
+        # Основной виджет и компоновка
+        central_widget = QWidget()
+        layout = QHBoxLayout()
+
+        task_1_tab = QWidget()
+        task_1_tab_layout = QVBoxLayout()
+        self.sequence = QLineEdit()
+        self.encode_button = QPushButton("Кодировать")
+        self.decode_button = QPushButton("Декодировать")
+        task_1_tab_layout.addWidget(self.sequence)
+        task_1_tab_layout.addWidget(self.encode_button)
+        task_1_tab_layout.addWidget(self.decode_button)
+
+        task_1_tab.setLayout(task_1_tab_layout)
+
+        tab_widget = QTabWidget()
+        tab_widget.addTab(task_1_tab, "Первая лаба")
+        layout.addWidget(tab_widget)
+        layout.addWidget(QTableView())
+
+        # Устанавливаем компоновку для центрального виджета
+        central_widget.setLayout(layout)
+        self.setCentralWidget(central_widget)
+
+    def create_menu(self):
+        menubar = self.menuBar()
+
+        # Создание меню "Файл"
+        file_menu = menubar.addMenu("Файл")
+
+        # Пункты меню в "Файл"
+        import_both_action = QAction("Импортировать Алфавит + вероятности", self)
+        export_answer_action = QAction("Экспортировать ответ", self)
+
+        import_both_action.triggered.connect(self.import_both)
+        export_answer_action.triggered.connect(self.export_answer)
+
+        file_menu.addAction(import_both_action)
+        file_menu.addAction(export_answer_action)
+
+        # Создание меню "О нас"
+        about_action = QAction("О нас", self)
+        menubar.addAction(about_action)
+
+        about_action.triggered.connect(self.show_about_window)
+
+
+    def import_alphabet(self):
+        # Диалог для выбора файла (импорт алфавита)
+        file_name, _ = QFileDialog.getOpenFileName(self, "Выберите файл с алфавитом", "",
+                                                   "Text Files (*.txt);;All Files (*)")
+        if file_name:
+            # Логика импорта алфавита
+            QMessageBox.information(self, "Импорт алфавита", f"Алфавит успешно импортирован из {file_name}.")
+
+    def import_probabilities(self):
+        # Диалог для выбора файла (импорт вероятностей)
+        file_name, _ = QFileDialog.getOpenFileName(self, "Выберите файл с вероятностями", "",
+                                                   "Text Files (*.txt);;All Files (*)")
+        if file_name:
+            # Логика импорта вероятностей
+            QMessageBox.information(self, "Импорт вероятностей", f"Вероятности успешно импортированы из {file_name}.")
+
+    def import_both(self):
+        # Логика для импорта алфавита и вероятностей одновременно
+        QMessageBox.information(self, "Импорт алфавита и вероятностей", "Импорт алфавита и вероятностей завершен.")
+
+    def export_answer(self):
+        # Диалог для сохранения файла (экспорт ответа)
+        file_name, _ = QFileDialog.getSaveFileName(self, "Сохранить ответ", "", "Text Files (*.txt);;All Files (*)")
+        if file_name:
+            # Логика экспорта ответа
+            QMessageBox.information(self, "Экспорт", f"Ответ успешно экспортирован в {file_name}.")
+
+    def show_about_window(self):
+        # Открытие окна "О нас"
+        self.about_window = AboutWindow()
+        self.about_window.show()
