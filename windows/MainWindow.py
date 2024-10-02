@@ -66,7 +66,7 @@ class MainWindow(QMainWindow):
         task_1_tab.setLayout(task_1_tab_layout)
 
         tab_widget = QTabWidget()
-        tab_widget.addTab(task_1_tab, "Алгоритм Гильберта-Мурра")
+        tab_widget.addTab(task_1_tab, "Алгоритм Гильбера-Мура")
         layout.addWidget(tab_widget)
         self.additional_info_field = QTextEdit()
         self.additional_info_field.setText(
