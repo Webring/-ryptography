@@ -1,3 +1,5 @@
+import csv
+
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QTabWidget, QTableView, QAction, QMessageBox, \
     QFileDialog, QLineEdit, QPushButton, QVBoxLayout
@@ -51,13 +53,17 @@ class MainWindow(QMainWindow):
         file_menu = menubar.addMenu("Файл")
 
         # Пункты меню в "Файл"
-        import_both_action = QAction("Импортировать Алфавит + вероятности", self)
+        import_probs_action = QAction("Импортировать алфавит и вероятности", self)
+        import_sequence_action = QAction("Импортировать последовательностей", self)
+
         export_answer_action = QAction("Экспортировать ответ", self)
 
-        import_both_action.triggered.connect(self.import_both)
+        import_probs_action.triggered.connect(self.import_probabilities)
         export_answer_action.triggered.connect(self.export_answer)
+        import_sequence_action.triggered.connect(self.import_sequence)
 
-        file_menu.addAction(import_both_action)
+        file_menu.addAction(import_probs_action)
+        file_menu.addAction(import_sequence_action)
         file_menu.addAction(export_answer_action)
 
         # Создание меню "О нас"
@@ -67,25 +73,32 @@ class MainWindow(QMainWindow):
         about_action.triggered.connect(self.show_about_window)
 
 
-    def import_alphabet(self):
-        # Диалог для выбора файла (импорт алфавита)
-        file_name, _ = QFileDialog.getOpenFileName(self, "Выберите файл с алфавитом", "",
-                                                   "Text Files (*.txt);;All Files (*)")
-        if file_name:
-            # Логика импорта алфавита
-            QMessageBox.information(self, "Импорт алфавита", f"Алфавит успешно импортирован из {file_name}.")
-
     def import_probabilities(self):
         # Диалог для выбора файла (импорт вероятностей)
         file_name, _ = QFileDialog.getOpenFileName(self, "Выберите файл с вероятностями", "",
-                                                   "Text Files (*.txt);;All Files (*)")
+                                                   "Text Files (*.csv)")
         if file_name:
-            # Логика импорта вероятностей
-            QMessageBox.information(self, "Импорт вероятностей", f"Вероятности успешно импортированы из {file_name}.")
-
-    def import_both(self):
-        # Логика для импорта алфавита и вероятностей одновременно
-        QMessageBox.information(self, "Импорт алфавита и вероятностей", "Импорт алфавита и вероятностей завершен.")
+            try:
+                with open(file_name, mode="r") as file:
+                    reader = csv.reader(file, delimiter=';')
+                    for row in reader:
+                        symbol, prob = row
+                        self.probabilities[symbol] = float(prob)
+                QMessageBox.information(self, "Импорт вероятностей", f"Вероятности успешно импортированы из {file_name}.")
+            except Exception as e:
+                QMessageBox.critical(self, "Ошибка импорта!", f"Во время импорта произошла ошибка '{e}'")
+    def import_sequence(self):
+        # Диалог для выбора файла (импорт вероятностей)
+        file_name, _ = QFileDialog.getOpenFileName(self, "Выберите файл c последовательностью", "",
+                                                   "Text Files (*.txt)")
+        if file_name:
+            try:
+                with open(file_name, mode="r") as file:
+                    self.sequence = file.readline().strip()
+                self.sequence_input.setText(self.sequence)
+                QMessageBox.information(self, "Импорт последовательности", f"Последовательность успешно импортирована из {file_name}.")
+            except Exception as e:
+                QMessageBox.critical(self, "Ошибка импорта!", f"Во время импорта произошла ошибка '{e}'")
 
     def export_answer(self):
         # Диалог для сохранения файла (экспорт ответа)
