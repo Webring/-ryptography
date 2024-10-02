@@ -70,7 +70,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(tab_widget)
         self.additional_info_field = QTextEdit()
         self.additional_info_field.setText(
-            "1. Выберите файл алфавита и вероятностей\n2. Введите последовательность\n3. нажмите на кодировать или декодировать")
+            "Инструкция:\n1. Выберите файл алфавита и вероятностей\n2. Введите последовательность\n3. нажмите на кодировать или декодировать")
         self.additional_info_field.setReadOnly(True)
         layout.addWidget(self.additional_info_field)
 
