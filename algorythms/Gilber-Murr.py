@@ -6,70 +6,66 @@ class Gilber_Murr:
 
     def __init__(self, probs: dict):
         self.probs = probs
-        self.mas_coding = {}
-        q, sigma, l, summa_lenghts, entropia, self.kraft = 0, 0, 0, 0, 0, 0
+        self.codes_for_symbols = {}
+        q, sigma, length, sum_of_lengths, entropy, self.components_of_Kraft = 0, 0, 0, 0, 0, 0
         for i in probs.keys():
-            entropia -= float(Fraction(probs[i])) * math.log(float(Fraction(probs[i])), 2)
+            entropy -= float(Fraction(probs[i])) * math.log(float(Fraction(probs[i])), 2)
             sigma = q + float(Fraction(probs[i])) / 2
             q += float(Fraction(probs[i]))
-            l = int((-math.log(float(Fraction(probs[i])) / 2, 2)) + 0.999999)
-            summa_lenghts += l
-            duble_number = self.decimal_to_binary_float(sigma, l)
-            self.mas_coding[i] = duble_number
-            self.kraft += 2 ** (-l)
-        self.middle_lenght = summa_lenghts / len(probs)
-        self.redundancy = self.middle_lenght - entropia
-
+            length = int((-math.log(float(Fraction(probs[i])) / 2, 2)) + 0.999999)
+            sum_of_lengths += length
+            number_in_binary = self.decimal_to_binary_float(sigma, length)
+            self.codes_for_symbols[i] = number_in_binary
+            self.components_of_Kraft += 2 ** (-length)
+        self.average_length = sum_of_lengths / len(probs)
+        self.redundancy = self.average_length - entropy
+    def __repr__(self):
+        return f'Gilber-Murr({self.probs, self.result})'
+    def __str__(self):
+        return f'''{'\n'.join([f'Символ: \'{key}\' кодируется \'{value}\'' for key,value in self.codes_for_symbols.items()])}
+Средняя длина: {self.average_length}
+Избыточность: {self.redundancy}
+Неравенство Крафта {"выполняется" if self.components_of_Kraft<=1 else "не выполняется"} ({self.components_of_Kraft})'''
     # Перевод числа с плавающей точкой в двочиную систему счисления
     def decimal_to_binary_float(self, number, dl):
-        res = ''
+        result = ''
 
         for _ in range(dl):
             number *= 2
-            res += str(number)[0]
+            result += str(number)[0]
             if number >= 1:
                 number -= 1
 
-        return res
+        return result
 
     # Алгоритм для кодирования последовательности
     def encoding(self, sequence: str):
-
-        for key, value in self.mas_coding.items():
-            print(f'Символ: \'{key}\' кодируется \'{value}\'')
-        print(f'Средняя длина: {self.middle_lenght}\n'
-              f'Избыточность: {self.redundancy}\n'
-              f'Крафт: {self.kraft}')
-        res = ''
+        self.result = ''
         for i in sequence:
-            for j in self.mas_coding:
+            for j in self.codes_for_symbols:
                 if str(i) == str(j):
-                    res += self.mas_coding[i]
+                    self.result += self.codes_for_symbols[i]
 
-        return res, self.mas_coding, self.middle_lenght, self.redundancy, self.kraft
+        return self.result, self.codes_for_symbols, self.average_length, self.redundancy, self.components_of_Kraft
 
     # Алгоритм для декодирования последовательности
     def decoding(self, sequence: str):
-
-        for key, value in self.mas_coding.items():
-            print(f'Символ: \'{key}\' кодируется \'{value}\'')
-        print(f'Средняя длина: {self.middle_lenght}\n Избыточность: {self.redundancy}\n Крафт: {self.kraft}')
-        res = ''
-        a = len(min(self.mas_coding.values(), key=len))
-        b = len(max(self.mas_coding.values(), key=len))
+        self.result = ''
+        a = len(min(self.codes_for_symbols.values(), key=len))
+        b = len(max(self.codes_for_symbols.values(), key=len))
         while sequence:
             for i in range(a, b + 1):
                 flag = True
                 current = sequence[:i]
-                for key, value in self.mas_coding.items():
+                for key, value in self.codes_for_symbols.items():
                     if str(current) == str(value):
-                        res += key
+                        self.result += key
                         sequence = sequence[i:]
                         flag = False
                         break
                 if not flag:
                     break
-        return res, self.mas_coding, self.middle_lenght, self.redundancy, self.kraft
+        return self.result, self.codes_for_symbols, self.average_length, self.redundancy, self.components_of_Kraft
 
 
 if __name__ == "__main__":
@@ -85,6 +81,7 @@ if __name__ == "__main__":
     2 - Декодирование последовательности\n'''))
         if choice == 1:
             g_m.encoding(seq)
+            print(str(g_m))
             end = int(input('''Выбери действие
     1 - Выбрать следующее действие
     Другое - Остановить программу\n'''))
