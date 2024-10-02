@@ -52,10 +52,11 @@ class GilbertMooreEncoder:
     # Алгоритм для декодирования последовательности
     def decode(self, sequence: str):
         self.result = ''
-        a = len(min(self.codes_for_symbols.values(), key=len))
-        b = len(max(self.codes_for_symbols.values(), key=len))
-        while sequence:
-            for i in range(a, b + 1):
+        minimum_of_length = len(min(self.codes_for_symbols.values(), key=len))
+        maximum_of_length = len(max(self.codes_for_symbols.values(), key=len))
+        limit = len(sequence)
+        while sequence and limit:
+            for i in range(minimum_of_length, maximum_of_length + 1):
                 flag = True
                 current = sequence[:i]
                 for key, value in self.codes_for_symbols.items():
@@ -66,6 +67,9 @@ class GilbertMooreEncoder:
                         break
                 if not flag:
                     break
+            limit -= 1
+        if limit == 0:
+            return f'Последовательность не можеть быть декодирована, так как в ней присутствуют коды, неупомянутые в таблице кодов'
         return self.result
 
 
