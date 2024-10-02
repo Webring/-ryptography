@@ -134,7 +134,7 @@ class MainWindow(QMainWindow):
                     reader = csv.reader(file, delimiter=';')
                     for row in reader:
                         symbol, prob = row
-                        self.probabilities[symbol] = float(prob)
+                        self.probabilities[symbol] = prob
                 self.statusBar().showMessage(f"Вероятности успешно импортированы из {file_name}.")
                 self.sequence_input.setDisabled(False)
                 self.encoded_sequence_input.setDisabled(False)
