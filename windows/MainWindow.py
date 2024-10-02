@@ -9,6 +9,13 @@ from windows.AboutWindow import AboutWindow
 
 from algorithms.GilbertMooreEncoder import GilbertMooreEncoder
 
+def prepare_additional_text(encoder, input=None, output=None):
+    result = str(encoder)
+    if input is not None and output is not None:
+        result += "\n" + ("-" * 50) + "\n"
+        result += f"Ввод: {input}\n"
+        result += f"Вывод: {output}\n"
+    return result
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -100,16 +107,22 @@ class MainWindow(QMainWindow):
         about_action.triggered.connect(self.show_about_window)
 
     def decode(self):
-        text = self.encoded_sequence_input.text()
-        decoded_message = self.encoder.decode(text)
-        self.additional_info_field.setText(str(self.encoder))
-        self.sequence_input.setText(decoded_message)
+        try:
+            text = self.encoded_sequence_input.text()
+            decoded_message = self.encoder.decode(text)
+            self.additional_info_field.setText(prepare_additional_text(self.encoder, text, decoded_message))
+            self.sequence_input.setText(decoded_message)
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка декодирования!", f"Во время декодирования произошла ошибка '{e}'")
 
     def encode(self):
-        text = self.sequence_input.text()
-        encoded_message = self.encoder.encode(text)
-        self.additional_info_field.setText(str(self.encoder))
-        self.encoded_sequence_input.setText(encoded_message)
+        try:
+            text = self.sequence_input.text()
+            encoded_message = self.encoder.encode(text)
+            self.additional_info_field.setText(prepare_additional_text(self.encoder, text, encoded_message))
+            self.encoded_sequence_input.setText(encoded_message)
+        except Exception as e:
+            QMessageBox.critical(self, "Ошибка кодирования!", f"Во время кодирования произошла ошибка '{e}'")
 
     def import_probabilities(self):
         # Диалог для выбора файла (импорт вероятностей)
@@ -133,6 +146,7 @@ class MainWindow(QMainWindow):
                 validator = QtGui.QRegExpValidator(regexp)
                 self.sequence_input.setValidator(validator)
                 self.encoder = GilbertMooreEncoder(self.probabilities)
+                self.additional_info_field.setText(prepare_additional_text(self.encoder))
             except Exception as e:
                 QMessageBox.critical(self, "Ошибка импорта!", f"Во время импорта произошла ошибка '{e}'")
 
@@ -154,7 +168,7 @@ class MainWindow(QMainWindow):
         if file_name:
             try:
                 with open(file_name, mode="w", encoding="utf-8") as file:
-                    print(self.encoder,"-" * 50, f"Ответ: {self.encoded_sequence_input.text()}", sep="\n", file=file)
+                    print(self.additional_info_field.toPlainText(), file=file)
                 self.statusBar().showMessage(f"Ответ успешно экспортирован в {file_name}.")
             except Exception as e:
                 QMessageBox.critical(self, "Ошибка импорта!", f"Во время импорта произошла ошибка '{e}'")
