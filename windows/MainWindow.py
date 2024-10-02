@@ -1,25 +1,27 @@
 import csv
+import re
 
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QTabWidget, QTableView, QAction, QMessageBox, \
-    QFileDialog, QLineEdit, QPushButton, QVBoxLayout
+    QFileDialog, QLineEdit, QPushButton, QVBoxLayout, QTextEdit, QLabel
 
 from windows.AboutWindow import AboutWindow
+
+from algorithms.GilbertMooreEncoder import GilbertMooreEncoder
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.sequence = ""
         self.probabilities = dict()
+        self.encoder = None
 
         # Настройка окна
         self.setWindowTitle("Криптография")
         self.setWindowIcon(QtGui.QIcon('icon.png'))
         self.initUI()
         self.create_menu()
-
 
     def initUI(self):
         # Основной виджет и компоновка
@@ -28,23 +30,47 @@ class MainWindow(QMainWindow):
 
         task_1_tab = QWidget()
         task_1_tab_layout = QVBoxLayout()
+
         self.sequence_input = QLineEdit()
+        self.sequence_input.setDisabled(True)
+        self.sequence_input.setPlaceholderText("Введите последовательность")
+
+        self.encoded_sequence_input = QLineEdit()
+        self.encoded_sequence_input.setDisabled(True)
+        self.encoded_sequence_input.setPlaceholderText("Введите закодированную последовательность")
+        regex_pattern = f"^[10]+;"
+        regexp = QtCore.QRegExp(regex_pattern)
+        validator = QtGui.QRegExpValidator(regexp)
+        self.encoded_sequence_input.setValidator(validator)
+
         self.encode_button = QPushButton("Кодировать")
+        self.encode_button.setDisabled(True)
+        self.encode_button.clicked.connect(self.encode)
         self.decode_button = QPushButton("Декодировать")
+        self.decode_button.setDisabled(True)
+        self.decode_button.clicked.connect(self.decode)
+
+
         task_1_tab_layout.addWidget(self.sequence_input)
+        task_1_tab_layout.addWidget(self.encoded_sequence_input)
         task_1_tab_layout.addWidget(self.encode_button)
         task_1_tab_layout.addWidget(self.decode_button)
 
         task_1_tab.setLayout(task_1_tab_layout)
 
         tab_widget = QTabWidget()
-        tab_widget.addTab(task_1_tab, "Первая лаба")
+        tab_widget.addTab(task_1_tab, "Алгоритм Гильберта-Мурра")
         layout.addWidget(tab_widget)
-        layout.addWidget(QTableView())
+        self.additional_info_field = QTextEdit()
+        self.additional_info_field.setText(
+            "1. Выберите файл алфавита и вероятностей\n2. Введите последовательность\n3. нажмите на кодировать или декодировать")
+        self.additional_info_field.setReadOnly(True)
+        layout.addWidget(self.additional_info_field)
 
         # Устанавливаем компоновку для центрального виджета
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
+        self.statusBar().showMessage("Выберете файл алфавита и вероятностей")
 
     def create_menu(self):
         menubar = self.menuBar()
@@ -55,23 +81,35 @@ class MainWindow(QMainWindow):
         # Пункты меню в "Файл"
         import_probs_action = QAction("Импортировать алфавит и вероятности", self)
         import_sequence_action = QAction("Импортировать последовательностей", self)
-
-        export_answer_action = QAction("Экспортировать ответ", self)
+        self.export_answer_action = QAction("Экспортировать ответ", self)
+        self.export_answer_action.setDisabled(True)
 
         import_probs_action.triggered.connect(self.import_probabilities)
-        export_answer_action.triggered.connect(self.export_answer)
+        self.export_answer_action.triggered.connect(self.export_answer)
         import_sequence_action.triggered.connect(self.import_sequence)
 
         file_menu.addAction(import_probs_action)
         file_menu.addAction(import_sequence_action)
-        file_menu.addAction(export_answer_action)
+        file_menu.addSeparator()
+        file_menu.addAction(self.export_answer_action)
 
         # Создание меню "О нас"
-        about_action = QAction("О нас", self)
+        about_action = QAction("О программе", self)
         menubar.addAction(about_action)
 
         about_action.triggered.connect(self.show_about_window)
 
+    def decode(self):
+        text = self.encoded_sequence_input.text()
+        decoded_message = self.encoder.decode(text)
+        self.additional_info_field.setText(str(self.encoder))
+        self.sequence_input.setText(decoded_message)
+
+    def encode(self):
+        text = self.sequence_input.text()
+        encoded_message = self.encoder.encode(text)
+        self.additional_info_field.setText(str(self.encoder))
+        self.encoded_sequence_input.setText(encoded_message)
 
     def import_probabilities(self):
         # Диалог для выбора файла (импорт вероятностей)
@@ -84,9 +122,20 @@ class MainWindow(QMainWindow):
                     for row in reader:
                         symbol, prob = row
                         self.probabilities[symbol] = float(prob)
-                QMessageBox.information(self, "Импорт вероятностей", f"Вероятности успешно импортированы из {file_name}.")
+                self.statusBar().showMessage(f"Вероятности успешно импортированы из {file_name}.")
+                self.sequence_input.setDisabled(False)
+                self.encoded_sequence_input.setDisabled(False)
+                self.encode_button.setDisabled(False)
+                self.decode_button.setDisabled(False)
+                self.export_answer_action.setDisabled(False)
+                regex_pattern = f"^[{''.join(map(re.escape, self.probabilities.keys()))}]+;"
+                regexp = QtCore.QRegExp(regex_pattern)
+                validator = QtGui.QRegExpValidator(regexp)
+                self.sequence_input.setValidator(validator)
+                self.encoder = GilbertMooreEncoder(self.probabilities)
             except Exception as e:
                 QMessageBox.critical(self, "Ошибка импорта!", f"Во время импорта произошла ошибка '{e}'")
+
     def import_sequence(self):
         # Диалог для выбора файла (импорт вероятностей)
         file_name, _ = QFileDialog.getOpenFileName(self, "Выберите файл c последовательностью", "",
@@ -94,18 +143,21 @@ class MainWindow(QMainWindow):
         if file_name:
             try:
                 with open(file_name, mode="r") as file:
-                    self.sequence = file.readline().strip()
-                self.sequence_input.setText(self.sequence)
-                QMessageBox.information(self, "Импорт последовательности", f"Последовательность успешно импортирована из {file_name}.")
+                    self.sequence_input.setText(file.readline().strip())
+                self.statusBar().showMessage(f"Последовательность успешно импортирована из {file_name}.")
             except Exception as e:
                 QMessageBox.critical(self, "Ошибка импорта!", f"Во время импорта произошла ошибка '{e}'")
 
     def export_answer(self):
         # Диалог для сохранения файла (экспорт ответа)
-        file_name, _ = QFileDialog.getSaveFileName(self, "Сохранить ответ", "", "Text Files (*.txt);;All Files (*)")
+        file_name, _ = QFileDialog.getSaveFileName(self, "Сохранить ответ", "", "Text Files (*.txt)")
         if file_name:
-            # Логика экспорта ответа
-            QMessageBox.information(self, "Экспорт", f"Ответ успешно экспортирован в {file_name}.")
+            try:
+                with open(file_name, mode="w", encoding="utf-8") as file:
+                    print(self.encoder,"-" * 50, f"Ответ: {self.encoded_sequence_input.text()}", sep="\n", file=file)
+                self.statusBar().showMessage(f"Ответ успешно экспортирован в {file_name}.")
+            except Exception as e:
+                QMessageBox.critical(self, "Ошибка импорта!", f"Во время импорта произошла ошибка '{e}'")
 
     def show_about_window(self):
         # Открытие окна "О нас"
