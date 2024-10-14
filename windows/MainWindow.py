@@ -8,6 +8,9 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QTabWidget, QActi
 
 # Импортируем класс GilbertMooreEncoder для работы с алгоритмом кодирования
 from algorithms.GilbertMooreEncoder import GilbertMooreEncoder
+from algorithms.GilbertMooreEncoderWithCheck import GilbertMooreEncoderWithCheck
+from widgets.GilbertMooreTab import GilbertMooreTab
+from widgets.GilbertMooreWithCheckTab import GilbertMooreWithCheckersTab
 # Импортируем окно "О программе" из другого модуля
 from windows.AboutWindow import AboutWindow
 
@@ -40,13 +43,23 @@ class MainWindow(QMainWindow):
         central_widget = QWidget()  # Основной виджет окна
         layout = QHBoxLayout()  # Горизонтальная компоновка элементов
 
-        task_1_tab = QWidget()  # Создание вкладки для первой задачи
-        task_1_tab_layout = QVBoxLayout()  # Вертикальная компоновка для вкладки
+        lines_layout = QVBoxLayout()
 
         # Поле ввода для последовательности
+        sequence_line = QHBoxLayout()
         self.sequence_input = QLineEdit()  # Поле для ввода последовательности
         self.sequence_input.setDisabled(True)  # Изначально поле отключено
         self.sequence_input.setPlaceholderText("Введите последовательность")  # Текст подсказки
+        sequence_line.addWidget(self.sequence_input)
+
+        # Кнопка "Кодировать"
+        self.encode_button = QPushButton("Кодировать")  # Создаем кнопку "Кодировать"
+        self.encode_button.setDisabled(True)  # Изначально кнопка отключена
+        self.encode_button.clicked.connect(self.encode)  # Подключаем функцию кодирования
+        sequence_line.addWidget(self.encode_button)
+        lines_layout.addLayout(sequence_line)
+
+        decoded_sequence_line = QHBoxLayout()
 
         # Поле ввода для закодированной последовательности
         self.encoded_sequence_input = QLineEdit()  # Поле для ввода закодированной последовательности
@@ -58,30 +71,23 @@ class MainWindow(QMainWindow):
         regexp = QtCore.QRegExp(regex_pattern)  # Создаем объект регулярного выражения
         validator = QtGui.QRegExpValidator(regexp)  # Создаем валидатор для проверки ввода по регулярному выражению
         self.encoded_sequence_input.setValidator(validator)  # Присваиваем валидатор полю
-
-        # Кнопка "Кодировать"
-        self.encode_button = QPushButton("Кодировать")  # Создаем кнопку "Кодировать"
-        self.encode_button.setDisabled(True)  # Изначально кнопка отключена
-        self.encode_button.clicked.connect(self.encode)  # Подключаем функцию кодирования
+        decoded_sequence_line.addWidget(self.encoded_sequence_input)
 
         # Кнопка "Декодировать"
         self.decode_button = QPushButton("Декодировать")  # Создаем кнопку "Декодировать"
         self.decode_button.setDisabled(True)  # Изначально кнопка отключена
         self.decode_button.clicked.connect(self.decode)  # Подключаем функцию декодирования
-
-        # Добавляем виджеты на вкладку
-        task_1_tab_layout.addWidget(self.sequence_input)
-        task_1_tab_layout.addWidget(self.encoded_sequence_input)
-        task_1_tab_layout.addWidget(self.encode_button)
-        task_1_tab_layout.addWidget(self.decode_button)
-
-        # Устанавливаем компоновку для вкладки
-        task_1_tab.setLayout(task_1_tab_layout)
+        decoded_sequence_line.addWidget(self.decode_button)
+        lines_layout.addLayout(decoded_sequence_line)
 
         # Создание вкладочного виджета и добавление вкладки
-        tab_widget = QTabWidget()
-        tab_widget.addTab(task_1_tab, "Алгоритм Гильбера-Мура")  # Вкладка для алгоритма Гильберта-Мура
-        layout.addWidget(tab_widget)
+        self.tab_widget = QTabWidget()
+        gilbert_moore_tab = GilbertMooreTab()
+        gilbert_moore_with_check_tab = GilbertMooreWithCheckersTab()
+        self.tab_widget.addTab(gilbert_moore_tab, "Гильберт-Мур")  # Вкладка для алгоритма Гильберта-Мура
+        self.tab_widget.addTab(gilbert_moore_with_check_tab, "Гильберт-Мур с проверкой")
+        self.tab_widget.currentChanged.connect(self.update_encoder)
+        layout.addWidget(self.tab_widget)
 
         # Поле для вывода дополнительной информации
         self.additional_info_field = QTextEdit()  # Поле для вывода информации
@@ -90,8 +96,9 @@ class MainWindow(QMainWindow):
         self.additional_info_field.setReadOnly(True)  # Поле только для чтения
         layout.addWidget(self.additional_info_field)
 
+        lines_layout.addLayout(layout)
         # Устанавливаем компоновку для центрального виджета
-        central_widget.setLayout(layout)
+        central_widget.setLayout(lines_layout)
         self.setCentralWidget(central_widget)  # Устанавливаем центральный виджет
         self.statusBar().showMessage("Выберете файл алфавита и вероятностей")  # Сообщение в статусной строке
 
@@ -150,6 +157,13 @@ class MainWindow(QMainWindow):
             # Отображаем сообщение об ошибке
             QMessageBox.critical(self, "Ошибка кодирования!", f"Во время кодирования произошла ошибка '{e}'")
 
+    def update_encoder(self):
+        try:
+            self.encoder = self.tab_widget.currentWidget().ENCODER(self.probabilities)
+        except Exception as e:
+            # Отображаем сообщение об ошибке
+            QMessageBox.critical(self, "Ошибка смены алгоритма!", f"Во время смены алгоритма произошла ошибка '{e}'")
+
     def import_probabilities(self):
         # Импорт вероятностей символов из файла
         file_name, _ = QFileDialog.getOpenFileName(self, "Выберите файл с вероятностями", "",
@@ -176,6 +190,7 @@ class MainWindow(QMainWindow):
                 self.sequence_input.setValidator(validator)
 
                 # Создаем новый объект кодировщика на основе импортированных вероятностей
+                self.update_encoder()
                 self.encoder = GilbertMooreEncoder(self.probabilities)
                 # Обновляем поле дополнительной информации
                 self.additional_info_field.setText(prepare_additional_text(self.encoder))
