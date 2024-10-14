@@ -12,10 +12,15 @@ class GilbertMooreEncoder:
         # Проверяем, что сумма вероятностей равна 1. Если нет, выбрасывается исключение.
         if sum(map(lambda x: float(Fraction(x)), probs.values())) != 1:
             raise Exception("Сумма вероятностей не равна 1")
+        for i in range(len(self.probs.values()) - 1):
+            if list(self.probs.values())[i] != list(self.probs.values())[i+1]:
+                raise Exception("Алфавит не равномерный")
         self.probs = {key:value for key, value in probs.items() if float(Fraction(value)) != 0.0}
 
-        self.codes_for_symbols = {}  # Словарь для хранения кодов для каждого символа.
-        q, sigma, length, sum_of_lengths, entropy, self.components_of_Kraft = 0, 0, 0, 0, 0, 0
+        self.codes_for_symbols = {}
+        self.codes_for_symbols_old = {}  # Словарь для хранения кодов для каждого символа.
+        q, sigma, length, sum_of_lengths, entropy = 0, 0, 0, 0, 0
+        self.errors = []
 
         # Проходим по каждому символу в словаре с вероятностями.
         for i in self.probs.keys():
@@ -37,15 +42,21 @@ class GilbertMooreEncoder:
 
             # Записываем двоичный код символа.
             self.codes_for_symbols[i] = number_in_binary
+            self.codes_for_symbols_old[i] = number_in_binary
 
-            # Проверяем неравенство Крафта.
-            self.components_of_Kraft += 2 ** (-length)
-
-        # Рассчитываем среднюю длину кода.
-        self.average_length = sum_of_lengths / len(probs)
-
-        # Рассчитываем избыточность.
-        self.redundancy = self.average_length - entropy
+        self.distance = []
+        for i in range(len(self.codes_for_symbols)):
+            self.distance.append([])
+            for j in range(len(self.codes_for_symbols)):
+                self.distance[i].append(1000)
+        #     # Проверяем неравенство Крафта.
+        #     self.components_of_Kraft += 2 ** (-length)
+        #
+        # # Рассчитываем среднюю длину кода.
+        # self.average_length = sum_of_lengths / len(probs)
+        #
+        # # Рассчитываем избыточность.
+        # self.redundancy = self.average_length - entropy
 
     def __repr__(self):
         """
@@ -57,10 +68,23 @@ class GilbertMooreEncoder:
         """
         Метод для форматированного вывода информации о кодировании.
         """
+        n = len(list(self.codes_for_symbols.values())[0])
+        k = len(list(self.codes_for_symbols_old.values())[0])
+        d0 = min(min(row) for row in self.distance)
+        sum_comb_hamming = sum([math.comb(n, i) for i in range(int((d0-1)/2)+1)])
+        sum_comb_varsh = sum([math.comb(n-1, i) for i in range(d0-2+1)])
+
         return f'''{'\n'.join([f'Символ: \'{key}\' кодируется \'{value}\'' for key, value in self.codes_for_symbols.items()])}
-Средняя длина: {self.average_length}
-Избыточность: {self.redundancy}
-Неравенство Крафта {"строгое - сжатие оптимальное" if self.components_of_Kraft == 1 else "не строгое - сжатие не оптимальное"} ({self.components_of_Kraft})'''
+Расстояния Хэмминга:
+{'\n'.join(['\t'.join([f'd{i+1}_{j+1} = {self.distance[i][j]}' for j in range(i+1, len(self.codes_for_symbols))]) for i in range(len(self.codes_for_symbols)-1)])}
+Кратсность обнаружения: q_обн <= {int(d0/2)}
+Кратсность исправления: q_исп <= {int((d0-1)/2)}
+Наименьшее расстояние Хэмминга: d0 = {d0}
+Граница Хэмминга: r = n - k = {n - k} >= log2({sum_comb_hamming}) = {math.log2(sum_comb_hamming)} {' Не выполняется' if (math.log2(sum_comb_hamming) > (n - k)) else " Выполняется"}
+Граница Плоткина: d0 = {min(min(row) for row in self.distance)} <= n * 2^(k-1) / (2^k – 1) = {n * pow(2,k-1) / (pow(2,k)-1)} {' Не выполняется' if (d0 > n * pow(2,k-1) / (pow(2,k)-1)) else " Выполняется"}
+Граница Варшамова-Гильберта: 2^(n-k) = {pow(2, n-k)} > {math.log2(sum_comb_varsh)} {' Не выполняется' if (pow(2, n-k) <= math.log2(sum_comb_varsh)) else " Выполняется"}
+'''
+
 
     # Перевод числа с плавающей точкой в двоичную систему счисления.
     def decimal_to_binary_float(self, number, dl):
@@ -92,7 +116,21 @@ class GilbertMooreEncoder:
                 if str(i) == str(j):
                     # Добавляем соответствующий код символа в результат.
                     self.result += self.codes_for_symbols[i]
+        for key,value in self.codes_for_symbols.items():
+            if sum(list(map(int, value))) % 2 == 0:
+                self.codes_for_symbols[key] += '0'
+            else:
+                self.codes_for_symbols[key] += '1'
+
+
+        for i in range(len(self.codes_for_symbols)):
+            for j in range(i,len(self.codes_for_symbols)):
+                if i != j:
+                    self.distance[i][j] = sum(1 for c1, c2 in zip(list(self.codes_for_symbols.values())[i], list(self.codes_for_symbols.values())[j]) if c1 != c2)
+                    self.distance[j][i] = self.distance[i][j]
+
         return self.result
+
 
     # Алгоритм для декодирования последовательности.
     def decode(self, sequence: str):
@@ -106,7 +144,7 @@ class GilbertMooreEncoder:
         maximum_of_length = len(max(self.codes_for_symbols.values(), key=len))
 
         limit = len(sequence)  # Ограничение по длине последовательности.
-
+        current_index = 0
         while sequence and limit:
             # Пробегаем от минимальной длины до максимальной.
             for i in range(minimum_of_length, maximum_of_length + 1):
@@ -118,25 +156,27 @@ class GilbertMooreEncoder:
                         self.result += key
                         sequence = sequence[i:]  # Убираем закодированную часть из последовательности.
                         flag = False
+                        current_index += 1
                         break
                 if not flag:
                     break
+            if limit < len(sequence)/2:
+                self.errors.append(f"error: {current_index+1}")
+                self.result += ' '
+                sequence = sequence[i:]
+                limit = len(sequence)
             limit -= 1
 
-        # Если limit дошёл до 0, но последовательность не декодирована, выбрасываем исключение.
-        if limit == 0:
-            raise Exception(
-                f'Последовательность не может быть декодирована, так как в ней присутствуют коды, неупомянутые в таблице кодов')
         return self.result
 
 
 if __name__ == "__main__":
     # Пример вероятностей для символов.
-    probs = {'+': '0.0', '-': '0.4', '*': '0.2', '/': '0.2', '=': '0.2'}
+    probs = {'+': '0.2', '-': '0.2', '*': '0.2', '/': '0.2', '=': '0.2'}
 
     # Пример последовательностей для кодирования и декодирования.
     seq = '++--**//=='
-    seq1 = '0001000101000100100010001011101111101110'
+    seq1 = '00011100110100101001100011000110111101111110111101'
 
     # Создаем объект кодировщика.
     g_m = GilbertMooreEncoder(probs=probs)
@@ -159,6 +199,7 @@ if __name__ == "__main__":
         elif choice == 2:
             # Декодирование.
             g_m.decode(seq1)
+            print(str(g_m))
             end = int(input('''Выбери действие
     1 - Выбрать следующее действие
     Другое - Остановить программу\n'''))
