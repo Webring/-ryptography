@@ -2,7 +2,7 @@ import math
 from fractions import Fraction
 
 
-class GilbertMooreEncoder:
+class GilbertMooreEncoderWithCheck:
 
     def __init__(self, probs: dict):
         """
@@ -82,7 +82,7 @@ class GilbertMooreEncoder:
 Наименьшее расстояние Хэмминга: d0 = {d0}
 Граница Хэмминга: r = n - k = {n - k} >= log2({sum_comb_hamming}) = {math.log2(sum_comb_hamming)} {' Не выполняется' if (math.log2(sum_comb_hamming) > (n - k)) else " Выполняется"}
 Граница Плоткина: d0 = {min(min(row) for row in self.distance)} <= n * 2^(k-1) / (2^k – 1) = {n * pow(2,k-1) / (pow(2,k)-1)} {' Не выполняется' if (d0 > n * pow(2,k-1) / (pow(2,k)-1)) else " Выполняется"}
-Граница Варшамова-Гильберта: 2^(n-k) = {pow(2, n-k)} > {math.log2(sum_comb_varsh)} {' Не выполняется' if (pow(2, n-k) <= math.log2(sum_comb_varsh)) else " Выполняется"}
+Граница Варшамова-Гильберта: 2^(n-k) = {pow(2, n-k)} > {sum_comb_varsh} {' Не выполняется' if (pow(2, n-k) <= sum_comb_varsh) else " Выполняется"}
 '''
 
 
@@ -179,7 +179,7 @@ if __name__ == "__main__":
     seq1 = '00011100110100101001100011000110111101111110111101'
 
     # Создаем объект кодировщика.
-    g_m = GilbertMooreEncoder(probs=probs)
+    g_m = GilbertMooreEncoderWithCheck(probs=probs)
 
     # Основная программа.
     end = 1
