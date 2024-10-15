@@ -1,9 +1,9 @@
-from GilbertMooreEncoderWithCheck import GilbertMooreEncoderWithCheck
+from algorithms.GilbertMooreEncoderWithCheck import GilbertMooreEncoderWithCheck
 import numpy as np
 import math
 
 
-class HammingCode:
+class HammingEncoder:
     def __init__(self, probs: dict):
         # Создаем экземпляр GilbertMooreEncoder
         self.hamming_matrix = None
