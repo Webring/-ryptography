@@ -8,7 +8,8 @@ from widgets.BaseTab import BaseTab
 
 class HammingTab(BaseTab):
     ENCODER = HammingEncoder
-    def __init__(self):
+    def __init__(self, parent=None):
+        self.parent = parent
         super().__init__()
 
         layout = QVBoxLayout()
@@ -31,6 +32,7 @@ class HammingTab(BaseTab):
                 with open(file_name, newline='') as csvfile:
                     reader = csv.reader(csvfile, delimiter=';')
                     self.encoder.read_hamming_matrix([list(map(int, row)) for row in reader])
+                self.parent.additional_info_field.setText(str(self.encoder))
 
                 QMessageBox.information(self, "Успех", "Матрица Хэмминга успешно загружена.")
             except Exception as e:

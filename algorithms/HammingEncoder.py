@@ -32,7 +32,6 @@ class HammingEncoder:
         d0 = min(min(row) for row in self.distance)
         sum_of_combinations_for_hamming = sum([math.comb(n, i) for i in range(int((d0 - 1) / 2) + 1)])
         sum_of_combinations_for_varshamov = sum([math.comb(n - 1, i) for i in range(d0 - 2 + 1)])
-
         return f'''Алгоритм Хэмминга
 {'\n'.join([f'Символ: \'{key}\' кодируется \'{value}\'' for key, value in self.codes_hamming.items()])}
 Расстояния Хэмминга:

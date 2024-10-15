@@ -81,9 +81,9 @@ class MainWindow(QMainWindow):
 
         # Создание вкладочного виджета и добавление вкладки
         self.tab_widget = QTabWidget()
-        gilbert_moore_tab = GilbertMooreTab()
-        gilbert_moore_with_check_tab = GilbertMooreWithCheckersTab()
-        hamming_tab = HammingTab()
+        gilbert_moore_tab = GilbertMooreTab(self)
+        gilbert_moore_with_check_tab = GilbertMooreWithCheckersTab(self)
+        hamming_tab = HammingTab(self)
         self.tab_widget.addTab(gilbert_moore_tab, "Гильберт-Мур")  # Вкладка для алгоритма Гильберта-Мура
         self.tab_widget.addTab(gilbert_moore_with_check_tab, "Гильберт-Мур с проверкой")
         self.tab_widget.addTab(hamming_tab, "Хэмминг")
@@ -163,6 +163,7 @@ class MainWindow(QMainWindow):
     def update_encoder(self):
         try:
             self.tab_widget.currentWidget().update_encoder(self.probabilities)
+            self.additional_info_field.setText(str(self.encoder))
         except Exception as e:
             # Отображаем сообщение об ошибке
             QMessageBox.critical(self, "Ошибка смены алгоритма!", f"Во время смены алгоритма произошла ошибка '{e}'")
