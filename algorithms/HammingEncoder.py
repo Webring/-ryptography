@@ -9,7 +9,7 @@ class HammingEncoder:
         self.hamming_matrix = None
         self.encoder = GilbertMooreEncoderWithCheck(probs)
         self.generation_matrix = None
-        self.codes_for_symbols_GM = self.encoder.codes_for_symbols
+        self.codes_for_symbols_GM = self.encoder.codes_for_symbols_old
         self.codes_hamming = {}
 
         self.result = ''
@@ -189,14 +189,14 @@ if __name__ == "__main__":
     ]
     probs = {'+': '0.2', '-': '0.2', '*': '0.2', '/': '0.2', '=': '0.2'}
 
-    hamming_code = HammingCode(probs=probs)
+    hamming_code = HammingEncoder(probs=probs)
     hamming_code.read_hamming_matrix(H)
     hamming_code.encode('+-/')
-    # print(hamming_code.result)
-    # print(hamming_code.check_and_correct([0,0,0,1,1,0,1]))
+    print(hamming_code.result)
+    print(hamming_code.check_and_correct([0,0,0,1,1,0,1]))
 
     hamming_code.decode('000110101011111011000')
-    # print(hamming_code.errors)
+    print(hamming_code.errors)
     # Кодовое слово
     # code = [0, 0, 1, 1]
     #
@@ -212,4 +212,4 @@ if __name__ == "__main__":
     # corrected_vector = hamming_code.check_and_correct(v)
     # print(f"Исправленное слово: {corrected_vector}")
 
-    # print(str(hamming_code))
+    print(str(hamming_code))

@@ -43,12 +43,24 @@ class GilbertMooreEncoderWithCheck:
             # Записываем двоичный код символа.
             self.codes_for_symbols[i] = number_in_binary
             self.codes_for_symbols_old[i] = number_in_binary
+        for key,value in self.codes_for_symbols.items():
+            if sum(list(map(int, value))) % 2 == 0:
+                self.codes_for_symbols[key] += '0'
+            else:
+                self.codes_for_symbols[key] += '1'
 
         self.distance = []
         for i in range(len(self.codes_for_symbols)):
             self.distance.append([])
             for j in range(len(self.codes_for_symbols)):
                 self.distance[i].append(1000)
+
+        for i in range(len(self.codes_for_symbols)):
+            for j in range(i,len(self.codes_for_symbols)):
+                if i != j:
+                    self.distance[i][j] = sum(1 for c1, c2 in zip(list(self.codes_for_symbols.values())[i], list(self.codes_for_symbols.values())[j]) if c1 != c2)
+                    self.distance[j][i] = self.distance[i][j]
+
         #     # Проверяем неравенство Крафта.
         #     self.components_of_Kraft += 2 ** (-length)
         #
@@ -117,18 +129,6 @@ class GilbertMooreEncoderWithCheck:
                 if str(i) == str(j):
                     # Добавляем соответствующий код символа в результат.
                     self.result += self.codes_for_symbols[i]
-        for key,value in self.codes_for_symbols.items():
-            if sum(list(map(int, value))) % 2 == 0:
-                self.codes_for_symbols[key] += '0'
-            else:
-                self.codes_for_symbols[key] += '1'
-
-
-        for i in range(len(self.codes_for_symbols)):
-            for j in range(i,len(self.codes_for_symbols)):
-                if i != j:
-                    self.distance[i][j] = sum(1 for c1, c2 in zip(list(self.codes_for_symbols.values())[i], list(self.codes_for_symbols.values())[j]) if c1 != c2)
-                    self.distance[j][i] = self.distance[i][j]
 
         return self.result
 
