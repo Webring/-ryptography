@@ -74,7 +74,8 @@ class GilbertMooreEncoderWithCheck:
         sum_comb_hamming = sum([math.comb(n, i) for i in range(int((d0-1)/2)+1)])
         sum_comb_varsh = sum([math.comb(n-1, i) for i in range(d0-2+1)])
 
-        return f'''{'\n'.join([f'Символ: \'{key}\' кодируется \'{value}\'' for key, value in self.codes_for_symbols.items()])}
+        return f'''Алгоритм Гилберта-Мура с проверочными битами
+{'\n'.join([f'Символ: \'{key}\' кодируется \'{value}\'' for key, value in self.codes_for_symbols.items()])}
 Расстояния Хэмминга:
 {'\n'.join(['\t'.join([f'd{i+1}_{j+1} = {self.distance[i][j]}' for j in range(i+1, len(self.codes_for_symbols))]) for i in range(len(self.codes_for_symbols)-1)])}
 Кратсность обнаружения: q_обн <= {int(d0/2)}

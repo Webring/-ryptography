@@ -33,7 +33,8 @@ class HammingEncoder:
         sum_of_combinations_for_hamming = sum([math.comb(n, i) for i in range(int((d0 - 1) / 2) + 1)])
         sum_of_combinations_for_varshamov = sum([math.comb(n - 1, i) for i in range(d0 - 2 + 1)])
 
-        return f'''{'\n'.join([f'Символ: \'{key}\' кодируется \'{value}\'' for key, value in self.codes_hamming.items()])}
+        return f'''Алгоритм Хэмминга
+{'\n'.join([f'Символ: \'{key}\' кодируется \'{value}\'' for key, value in self.codes_hamming.items()])}
 Расстояния Хэмминга:
 {'\n'.join(['\t'.join([f'd{i + 1}_{j + 1} = {self.distance[i][j]}' for j in range(i + 1, len(self.codes_hamming))]) for i in range(len(self.codes_hamming) - 1)])}
 Кратсность обнаружения: q_обн <= {math.ceil(d0 / 2)}

@@ -57,7 +57,8 @@ class GilbertMooreEncoder:
         """
         Метод для форматированного вывода информации о кодировании.
         """
-        return f'''{'\n'.join([f'Символ: \'{key}\' кодируется \'{value}\'' for key, value in self.codes_for_symbols.items()])}
+        return f'''Алгоритм Гилберта-Мура
+{'\n'.join([f'Символ: \'{key}\' кодируется \'{value}\'' for key, value in self.codes_for_symbols.items()])}
 Средняя длина: {self.average_length}
 Избыточность: {self.redundancy}
 Неравенство Крафта {"строгое - сжатие оптимальное" if self.components_of_Kraft == 1 else "не строгое - сжатие не оптимальное"} ({self.components_of_Kraft})'''
