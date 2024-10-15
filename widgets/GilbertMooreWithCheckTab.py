@@ -1,9 +1,10 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
 
 from algorithms.GilbertMooreEncoderWithCheck import GilbertMooreEncoderWithCheck
+from widgets.BaseTab import BaseTab
 
 
-class GilbertMooreWithCheckersTab(QWidget):
+class GilbertMooreWithCheckersTab(BaseTab):
     ENCODER = GilbertMooreEncoderWithCheck
     def __init__(self):
         super().__init__()

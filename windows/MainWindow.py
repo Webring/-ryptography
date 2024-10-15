@@ -7,10 +7,9 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QTabWidget, QActi
     QFileDialog, QLineEdit, QPushButton, QVBoxLayout, QTextEdit
 
 # Импортируем класс GilbertMooreEncoder для работы с алгоритмом кодирования
-from algorithms.GilbertMooreEncoder import GilbertMooreEncoder
-from algorithms.GilbertMooreEncoderWithCheck import GilbertMooreEncoderWithCheck
 from widgets.GilbertMooreTab import GilbertMooreTab
 from widgets.GilbertMooreWithCheckTab import GilbertMooreWithCheckersTab
+from widgets.HammingTab import HammingTab
 # Импортируем окно "О программе" из другого модуля
 from windows.AboutWindow import AboutWindow
 
@@ -30,7 +29,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.probabilities = dict()  # Словарь для хранения вероятностей символов
-        self.encoder = None  # Объект для работы с кодировщиком
+        # self.encoder = None  # Объект для работы с кодировщиком
 
         # Настройка параметров окна
         self.setWindowTitle("Криптография")  # Устанавливаем заголовок окна
@@ -84,8 +83,10 @@ class MainWindow(QMainWindow):
         self.tab_widget = QTabWidget()
         gilbert_moore_tab = GilbertMooreTab()
         gilbert_moore_with_check_tab = GilbertMooreWithCheckersTab()
+        hamming_tab = HammingTab()
         self.tab_widget.addTab(gilbert_moore_tab, "Гильберт-Мур")  # Вкладка для алгоритма Гильберта-Мура
         self.tab_widget.addTab(gilbert_moore_with_check_tab, "Гильберт-Мур с проверкой")
+        self.tab_widget.addTab(hamming_tab, "Хэмминг")
         self.tab_widget.currentChanged.connect(self.update_encoder)
         layout.addWidget(self.tab_widget)
 
@@ -156,10 +157,12 @@ class MainWindow(QMainWindow):
         except Exception as e:
             # Отображаем сообщение об ошибке
             QMessageBox.critical(self, "Ошибка кодирования!", f"Во время кодирования произошла ошибка '{e}'")
-
+    @property
+    def encoder(self):
+        return self.tab_widget.currentWidget().encoder
     def update_encoder(self):
         try:
-            self.encoder = self.tab_widget.currentWidget().ENCODER(self.probabilities)
+            self.tab_widget.currentWidget().update_encoder(self.probabilities)
         except Exception as e:
             # Отображаем сообщение об ошибке
             QMessageBox.critical(self, "Ошибка смены алгоритма!", f"Во время смены алгоритма произошла ошибка '{e}'")
@@ -191,7 +194,6 @@ class MainWindow(QMainWindow):
 
                 # Создаем новый объект кодировщика на основе импортированных вероятностей
                 self.update_encoder()
-                self.encoder = GilbertMooreEncoder(self.probabilities)
                 # Обновляем поле дополнительной информации
                 self.additional_info_field.setText(prepare_additional_text(self.encoder))
             except Exception as e:
