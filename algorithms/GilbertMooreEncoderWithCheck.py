@@ -162,7 +162,7 @@ class GilbertMooreEncoderWithCheck:
                 if not flag:
                     break
             if limit < len(sequence)/2:
-                self.errors.append(f"error: {current_index+1}")
+                self.errors.append(f"word: {current_index+1}")
                 self.result += ' '
                 sequence = sequence[i:]
                 limit = len(sequence)

@@ -1,1 +1,1 @@
-['word: 1, bit: 4', 'word: 2, bit: 1']
+['word: 1']
