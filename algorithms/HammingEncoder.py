@@ -31,6 +31,12 @@ class HammingEncoder:
             return "Загрузите матрицу Хэмминга"
         n = len(list(self.codes_hamming.values())[0])
         k = len(list(self.codes_for_symbols_GM.values())[0])
+        codes_list = list(self.codes_hamming.values())
+        for i in range(len(self.codes_hamming)):
+            for j in range(i, len(self.codes_hamming)):
+                if i != j:
+                    self.distance[i][j] = sum(1 for c1, c2 in zip(codes_list[i], codes_list[j]) if c1 != c2)
+                    self.distance[j][i] = self.distance[i][j]
         d0 = min(min(row) for row in self.distance)
         sum_of_combinations_for_hamming = sum([math.comb(n, i) for i in range(int((d0 - 1) / 2) + 1)])
         sum_of_combinations_for_varshamov = sum([math.comb(n - 1, i) for i in range(d0 - 2 + 1)])
@@ -38,8 +44,8 @@ class HammingEncoder:
 {'\n'.join([f'Символ: \'{key}\' кодируется \'{value}\'' for key, value in self.codes_hamming.items()])}
 Расстояния Хэмминга:
 {'\n'.join(['\t'.join([f'd{i + 1}_{j + 1} = {self.distance[i][j]}' for j in range(i + 1, len(self.codes_hamming))]) for i in range(len(self.codes_hamming) - 1)])}
-Кратсность обнаружения: q_обн <= {math.ceil(d0 / 2)}
-Кратсность исправления: q_исп <= {int((d0 - 1) / 2)}
+Кратность обнаружения: q_обн <= {math.ceil(d0 / 2)}
+Кратность исправления: q_исп <= {int((d0 - 1) / 2)}
 Наименьшее расстояние Хэмминга: d0 = {d0}
 Граница Хэмминга: r = n - k = {n - k} >= log2({sum_of_combinations_for_hamming}) = {math.log2(sum_of_combinations_for_hamming)} {' Не выполняется' if (math.log2(sum_of_combinations_for_hamming) > (n - k)) else " Выполняется"}
 Граница Плоткина: d0 = {min(min(row) for row in self.distance)} <= n * 2^(k-1) / (2^k – 1) = {n * pow(2, k - 1) / (pow(2, k) - 1)} {' Не выполняется' if (d0 > n * pow(2, k - 1) / (pow(2, k) - 1)) else " Выполняется"}
@@ -132,12 +138,6 @@ class HammingEncoder:
                     # Добавляем соответствующий код символа в результат.
                     self.result += self.codes_hamming[i]
 
-        codes_list = list(self.codes_hamming.values())
-        for i in range(len(self.codes_hamming)):
-            for j in range(i, len(self.codes_hamming)):
-                if i != j:
-                    self.distance[i][j] = sum(1 for c1, c2 in zip(codes_list[i], codes_list[j]) if c1 != c2)
-                    self.distance[j][i] = self.distance[i][j]
 
         return self.result
 

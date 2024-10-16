@@ -81,8 +81,8 @@ class GilbertMooreEncoderWithCheck:
 {'\n'.join([f'Символ: \'{key}\' кодируется \'{value}\'' for key, value in self.codes_for_symbols.items()])}
 Расстояния Хэмминга:
 {'\n'.join(['\t'.join([f'd{i+1}_{j+1} = {self.distance[i][j]}' for j in range(i+1, len(self.codes_for_symbols))]) for i in range(len(self.codes_for_symbols)-1)])}
-Кратсность обнаружения: q_обн <= {int(d0/2)}
-Кратсность исправления: q_исп <= {int((d0-1)/2)}
+Кратность обнаружения: q_обн <= {int(d0/2)}
+Кратность исправления: q_исп <= {int((d0-1)/2)}
 Наименьшее расстояние Хэмминга: d0 = {d0}
 Граница Хэмминга: r = n - k = {n - k} >= log2({sum_comb_hamming}) = {math.log2(sum_comb_hamming)} {' Не выполняется' if (math.log2(sum_comb_hamming) > (n - k)) else " Выполняется"}
 Граница Плоткина: d0 = {min(min(row) for row in self.distance)} <= n * 2^(k-1) / (2^k – 1) = {n * pow(2,k-1) / (pow(2,k)-1)} {' Не выполняется' if (d0 > n * pow(2,k-1) / (pow(2,k)-1)) else " Выполняется"}
