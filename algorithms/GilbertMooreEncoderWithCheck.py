@@ -61,15 +61,6 @@ class GilbertMooreEncoderWithCheck:
                     self.distance[i][j] = sum(1 for c1, c2 in zip(list(self.codes_for_symbols.values())[i], list(self.codes_for_symbols.values())[j]) if c1 != c2)
                     self.distance[j][i] = self.distance[i][j]
 
-        #     # Проверяем неравенство Крафта.
-        #     self.components_of_Kraft += 2 ** (-length)
-        #
-        # # Рассчитываем среднюю длину кода.
-        # self.average_length = sum_of_lengths / len(probs)
-        #
-        # # Рассчитываем избыточность.
-        # self.redundancy = self.average_length - entropy
-
     def __repr__(self):
         """
         Метод для представления объекта.
