@@ -27,6 +27,8 @@ class HammingEncoder:
         """
         Метод для форматированного вывода информации о кодировании.
         """
+        if self.generation_matrix is None:
+            return "Загрузите матрицу Хэмминга"
         n = len(list(self.codes_hamming.values())[0])
         k = len(list(self.codes_for_symbols_GM.values())[0])
         d0 = min(min(row) for row in self.distance)
@@ -173,9 +175,13 @@ class HammingEncoder:
                 current_list = [int(digit) for digit in current_part_of_sequence]
                 correct_vector = self.check_and_correct(current_list)
                 self.errors.append(f"word: {current_index+1}, bit: {self.sindrome}")
-                self.result += ''.join(str(num) for num in correct_vector)
+                correct_code = ''.join(str(num) for num in correct_vector)
+                for key,value in self.codes_hamming.items():
+                    if correct_code == value:
+                        self.result += key
                 sequence = sequence[i:]
                 limit = len(sequence)
+                current_index += 1
             limit -= 1
 
         return self.result
