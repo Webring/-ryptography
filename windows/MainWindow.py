@@ -128,8 +128,9 @@ class MainWindow(QMainWindow):
         file_menu.addAction(self.export_answer_action)
 
         # Создание меню "О программе"
-        about_action = QAction("О программе", self)
-        menubar.addAction(about_action)
+        about_menu = menubar.addMenu("О программе")
+        about_action = QAction("*клик*", self)
+        about_menu.addAction(about_action)
 
         # Подключаем окно "О программе"
         about_action.triggered.connect(self.show_about_window)
