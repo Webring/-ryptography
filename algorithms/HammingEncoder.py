@@ -44,7 +44,7 @@ class HammingEncoder:
 {'\n'.join([f'Символ: \'{key}\' кодируется \'{value}\'' for key, value in self.codes_hamming.items()])}
 Расстояния Хэмминга:
 {'\n'.join(['\t'.join([f'd{i + 1}_{j + 1} = {self.distance[i][j]}' for j in range(i + 1, len(self.codes_hamming))]) for i in range(len(self.codes_hamming) - 1)])}
-Кратность обнаружения: q_обн <= {math.ceil(d0 / 2)}
+Кратность обнаружения: q_обн <= {d0 - 1}
 Кратность исправления: q_исп <= {int((d0 - 1) / 2)}
 Наименьшее расстояние Хэмминга: d0 = {d0}
 Граница Хэмминга: r = n - k = {n - k} >= log2({sum_of_combinations_for_hamming}) = {math.log2(sum_of_combinations_for_hamming)} {' Не выполняется' if (math.log2(sum_of_combinations_for_hamming) > (n - k)) else " Выполняется"}
