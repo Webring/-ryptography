@@ -13,7 +13,7 @@ class CaezarEncoder:
         if shift <= 0:
             raise Exception("Сдвиг не может быть меньше 0")
         elif shift > self.N:
-            raise Exception("Сдвиг не может быть больше 0")
+            raise Exception("Сдвиг не может быть больше N")
         return
 
     def encoder(self, seq, shift):
