@@ -8,6 +8,7 @@ class GilbertMooreEncoderWithCheck:
         """
         Конструктор класса. Принимает словарь, в котором ключи — это символы, а значения — их вероятности (в виде строк).
         """
+        self.output_alphabet = "01"
         self.probs = probs
         # Проверяем, что сумма вероятностей равна 1. Если нет, выбрасывается исключение.
         if sum(map(lambda x: float(Fraction(x)), probs.values())) != 1:

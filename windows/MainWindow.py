@@ -24,6 +24,7 @@ def prepare_additional_text(encoder, input=None, output=None):
         result += f"Вывод: {output}\n"  # Добавляем строку с выходными данными
     return result  # Возвращаем итоговую строку
 
+
 class MainWindow(QMainWindow):
     def __init__(self):
         # Инициализация главного окна
@@ -161,15 +162,20 @@ class MainWindow(QMainWindow):
         except Exception as e:
             # Отображаем сообщение об ошибке
             QMessageBox.critical(self, "Ошибка кодирования!", f"Во время кодирования произошла ошибка '{e}'")
+
     @property
     def encoder(self):
         return self.tab_widget.currentWidget().encoder
+
     def update_encoder(self):
         try:
             self.tab_widget.currentWidget().update_encoder(self.probabilities)
+            regex_pattern = f"^[{''.join(map(re.escape, self.encoder.output_alphabet))}]+;"
+            regexp = QtCore.QRegExp(regex_pattern)
+            validator = QtGui.QRegExpValidator(regexp)
+            self.encoded_sequence_input.setValidator(validator)
             self.additional_info_field.setText(str(self.encoder))
         except Exception as e:
-            # Отображаем сообщение об ошибке
             QMessageBox.critical(self, "Ошибка смены алгоритма!", f"Во время смены алгоритма произошла ошибка '{e}'")
 
     def import_probabilities(self):
@@ -213,7 +219,8 @@ class MainWindow(QMainWindow):
             try:
                 with open(file_name, mode="r") as file:
                     self.sequence_input.setText(file.readline().strip())  # Считываем строку из файла
-                self.statusBar().showMessage(f"Последовательность успешно импортирована из {file_name}.")  # Обновляем статус
+                self.statusBar().showMessage(
+                    f"Последовательность успешно импортирована из {file_name}.")  # Обновляем статус
             except Exception as e:
                 # Отображаем сообщение об ошибке
                 QMessageBox.critical(self, "Ошибка импорта!", f"Во время импорта произошла ошибка '{e}'")

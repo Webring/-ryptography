@@ -7,6 +7,7 @@ class HammingEncoder:
     def __init__(self, probs: dict):
         # Создаем экземпляр GilbertMooreEncoder
         self.hamming_matrix = None
+        self.output_alphabet = "01"
         self.encoder = GilbertMooreEncoderWithCheck(probs)
         self.generation_matrix = None
         self.codes_for_symbols_GM = self.encoder.codes_for_symbols_old
