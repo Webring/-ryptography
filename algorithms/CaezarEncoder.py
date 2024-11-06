@@ -3,6 +3,7 @@ class CaezarEncoder:
         self.alphabet = alphabet
         if isinstance(alphabet, dict):
             self.alphabet = "".join(alphabet.keys())
+        self.output_alphabet = self.alphabet
         self.N = len(alphabet)
         self.shift = 0
 

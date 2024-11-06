@@ -24,5 +24,4 @@ class CaezerTab(BaseTab):
 
 
     def change_shift(self, value):
-        print(value)
         self.encoder.set_shift(value)

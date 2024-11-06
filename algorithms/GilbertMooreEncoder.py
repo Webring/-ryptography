@@ -5,6 +5,7 @@ from fractions import Fraction
 class GilbertMooreEncoder:
 
     def __init__(self, probs: dict):
+        self.output_alphabet = "01"
         """
         Конструктор класса. Принимает словарь, в котором ключи — это символы, а значения — их вероятности (в виде строк).
         """
