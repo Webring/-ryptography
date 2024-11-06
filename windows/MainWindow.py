@@ -6,6 +6,7 @@ from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QTabWidget, QAction, QMessageBox, \
     QFileDialog, QLineEdit, QPushButton, QVBoxLayout, QTextEdit
 
+from widgets.CaezarTab import CaezerTab
 # Импортируем класс GilbertMooreEncoder для работы с алгоритмом кодирования
 from widgets.GilbertMooreTab import GilbertMooreTab
 from widgets.GilbertMooreWithCheckTab import GilbertMooreWithCheckersTab
@@ -84,9 +85,11 @@ class MainWindow(QMainWindow):
         gilbert_moore_tab = GilbertMooreTab(self)
         gilbert_moore_with_check_tab = GilbertMooreWithCheckersTab(self)
         hamming_tab = HammingTab(self)
+        caezar_tab = CaezerTab(self)
         self.tab_widget.addTab(gilbert_moore_tab, "Гильберт-Мур")  # Вкладка для алгоритма Гильберта-Мура
         self.tab_widget.addTab(gilbert_moore_with_check_tab, "Гильберт-Мур с проверкой")
         self.tab_widget.addTab(hamming_tab, "Хэмминг")
+        self.tab_widget.addTab(caezar_tab, "Цезарь")
         self.tab_widget.currentChanged.connect(self.update_encoder)
         layout.addWidget(self.tab_widget)
 

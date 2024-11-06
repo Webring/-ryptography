@@ -1,41 +1,42 @@
 class CaezarEncoder:
     def __init__(self, alphabet: str):
         self.alphabet = alphabet
+        if isinstance(alphabet, dict):
+            self.alphabet = "".join(alphabet.keys())
         self.N = len(alphabet)
+        self.shift = 0
 
     def __repr__(self):
         return f'CaezarEncoder({self.alphabet})'
 
     def __str__(self):
-        return
+        return "Дополнительной информации нет"
 
-    def validation(self, shift):
+    def set_shift(self, shift):
         if shift <= 0:
             raise Exception("Сдвиг не может быть меньше 0")
         elif shift > self.N:
             raise Exception("Сдвиг не может быть больше N")
-        return
+        self.shift = shift
 
-    def encoder(self, seq, shift):
-        self.validation(shift)
+
+    def encode(self, seq):
         res = ''
         for char in seq:
             if char in self.alphabet:
-                res += self.alphabet[(self.alphabet.index(char) + shift) % self.N]
+                res += self.alphabet[(self.alphabet.index(char) + self.shift) % self.N]
             else:
                 raise Exception("Какой(-ие)-то символ(-ы) отсутствуют в алфавите")
         return res
 
-    def decoder(self, seq, shift):
-        self.validation(shift)
+    def decode(self, seq):
         res = ''
         for char in seq:
             if char in self.alphabet:
-                res += self.alphabet[(self.alphabet.index(char) - shift + self.N) % self.N]
+                res += self.alphabet[(self.alphabet.index(char) - self.shift + self.N) % self.N]
             else:
                 raise Exception("Какой(-ие)-то символ(-ы) отсутствуют в алфавите")
         return res
-
 
 
 if __name__ == "__main__":
