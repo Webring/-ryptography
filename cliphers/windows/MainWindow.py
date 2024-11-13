@@ -50,14 +50,14 @@ class MainWindow(QMainWindow):
         layout.addLayout(tab_layout)
         self.additional_info_field = QTextEdit()  # Поле для вывода информации
         self.additional_info_field.setText(
-            "Инструкция:\n1. Выберите файл алфавита и вероятностей\n2. Введите последовательность\n3. нажмите на кодировать или декодировать")
-        self.additional_info_field.setReadOnly(True)  # Поле только для чтения
+            "Введите коэффициенты со следующими ограничениями:\nN   – натуральное число, степень двойки\na   – неотрицательное нечетное целое число\nc   – неотрицательное четное целое число\nx0 – неотрицательное нечетное целое число")
+        self.additional_info_field.setReadOnly(True)
         layout.addWidget(self.additional_info_field)
 
         # Устанавливаем компоновку для центрального виджета
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)  # Устанавливаем центральный виджет
-        self.statusBar().showMessage("Введите коэфиценты")  # Сообщение в статусной строке
+        self.statusBar().showMessage("Введите коэфиценты или импортируйте их из файла")  # Сообщение в статусной строке
 
     def create_menu(self):
         # Создание меню в верхней части окна
