@@ -1,5 +1,6 @@
 from scipy.stats import chisquare
 from collections import Counter
+import numpy as np
 
 
 class EichenauerLehnGeneratorWithReversal:
@@ -23,6 +24,14 @@ class EichenauerLehnGeneratorWithReversal:
         else "Нет оснований отвергать нулевую гипотезу (H0): последовательность соответствует ожидаемому распределению."}'
 
     def validation(self):
+        if int(np.log2(self.N)) != np.log2(self.N):
+            raise Exception("N должна быть степенью двойки")
+        if self.a % 2 == 0:
+            raise Exception("Коэффициент a должен быть нечётным")
+        if self.c % 2 == 1:
+            raise Exception("Коэффициент c должен быть чётным")
+        if self.x_0 % 2 == 0:
+            raise Exception("Начальное значение x0 должно быть нечётным")
         return 0 <= self.a < self.N and 0 <= self.c < self.N and 0 <= self.x_0 < self.N
 
     def reverse_to_mod(self, x):
