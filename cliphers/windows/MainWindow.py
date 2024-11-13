@@ -66,9 +66,12 @@ class MainWindow(QMainWindow):
         # Создание меню "Файл"
         file_menu = menubar.addMenu("Файл")
 
+        self.import_data_action = QAction("Импортировать данные", self)
         self.export_answer_action = QAction("Экспортировать ответ", self)
         self.export_answer_action.triggered.connect(self.export_answer)
+        self.import_data_action.triggered.connect(self.import_data)
 
+        file_menu.addAction(self.import_data_action)
         file_menu.addAction(self.export_answer_action)
 
         about_menu = menubar.addMenu("О программе")
@@ -76,6 +79,25 @@ class MainWindow(QMainWindow):
         about_menu.addAction(about_action)
 
         about_action.triggered.connect(self.show_about_window)
+
+    def import_data(self):
+        # Экспорт закодированного/декодированного сообщения в файл
+        file_name, _ = QFileDialog.getOpenFileName(self, "Открыть файл с данными", "", "Text Files (*.txt)")
+        if file_name:
+            coefs_line = ""
+            try:
+                with open(file_name, mode="r", encoding="utf-8") as file:
+                    coefs_line = file.readline().strip()
+                n, a, c, x0 = list(map(int, coefs_line.split()))
+                self.n_spin_box.setValue(n)
+                self.a_spin_box.setValue(a)
+                self.c_spin_box.setValue(c)
+                self.x0_spin_box.setValue(x0)
+                self.statusBar().showMessage(f"Ответ успешно экспортирован в {file_name}.")  # Обновляем статус
+                self.generate()
+            except Exception as e:
+                # Отображаем сообщение об ошибке
+                QMessageBox.critical(self, "Ошибка импорта!", f"Во время импорта произошла ошибка '{e}'")
 
     def export_answer(self):
         # Экспорт закодированного/декодированного сообщения в файл
@@ -87,7 +109,7 @@ class MainWindow(QMainWindow):
                 self.statusBar().showMessage(f"Ответ успешно экспортирован в {file_name}.")  # Обновляем статус
             except Exception as e:
                 # Отображаем сообщение об ошибке
-                QMessageBox.critical(self, "Ошибка импорта!", f"Во время импорта произошла ошибка '{e}'")
+                QMessageBox.critical(self, "Ошибка экспорта!", f"Во время экспорта произошла ошибка '{e}'")
 
     def generate(self):
         n = self.n_spin_box.value()
