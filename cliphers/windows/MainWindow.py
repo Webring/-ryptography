@@ -93,7 +93,7 @@ class MainWindow(QMainWindow):
                 self.a_spin_box.setValue(a)
                 self.c_spin_box.setValue(c)
                 self.x0_spin_box.setValue(x0)
-                self.statusBar().showMessage(f"Ответ успешно экспортирован в {file_name}.")  # Обновляем статус
+                self.statusBar().showMessage(f"Ответ успешно импортирован в {file_name}.")  # Обновляем статус
                 self.generate()
             except Exception as e:
                 # Отображаем сообщение об ошибке
