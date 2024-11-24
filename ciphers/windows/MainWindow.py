@@ -3,8 +3,8 @@ from PyQt5 import QtGui
 from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QAction, QMessageBox, \
     QFileDialog, QPushButton, QVBoxLayout, QTextEdit, QLabel, QSpinBox
 
-from cliphers.algorithms.EichenauerLehnGeneratorWithReversal import EichenauerLehnGeneratorWithReversal
-from cliphers.windows.AboutWindow import AboutWindow
+from ciphers.algorithms.EichenauerLehnGeneratorWithReversal import EichenauerLehnGeneratorWithReversal
+from ciphers.windows.AboutWindow import AboutWindow
 
 
 def widget_with_label(widget, label: str):
