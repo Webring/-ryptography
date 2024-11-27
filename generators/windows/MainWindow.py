@@ -47,8 +47,8 @@ class MainWindow(QMainWindow):
 
         layout.addLayout(tab_layout)
         self.additional_info_field = QTextEdit()  # Поле для вывода информации
-        self.additional_info_field.setText(  # ToDo Новая справка
-            "Введите коэффициенты со следующими ограничениями:\nN   – натуральное число, степень двойки\na   – неотрицательное нечетное целое число\nc   – неотрицательное четное целое число\nx0 – неотрицательное нечетное целое число\nПричем a, c, x0 должны быть меньше N")
+        self.additional_info_field.setText(
+            "Задайте начальный(минимальный) бит \'a\' и конечный(максимальный) бит \'b\'")
         self.additional_info_field.setReadOnly(True)
         layout.addWidget(self.additional_info_field)
 
